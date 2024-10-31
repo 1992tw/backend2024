@@ -3,6 +3,12 @@
 Basic Node.js MongoDB auth server
 Register + Login 
 
+
+
+Don't forget to update .env file! 
+
+
+
 ## Installation
 
 Run the following commands to install the necessary dependencies and start the development server:
@@ -11,8 +17,4 @@ Run the following commands to install the necessary dependencies and start the d
 sudo npm install
 sudo npm run dev
 
-```
-.env:
-MONGO_URI=mongodb+srv://name:password.........
-JWT_SECRET=
-PORT=5000
+
