@@ -1,14 +1,9 @@
-<html>
-  <p># backend2024
+# backend2024
 
-sudo npm i
+## Installation
+
+Run the following commands to install the necessary dependencies and start the development server:
+
+```bash
+sudo npm install
 sudo npm run dev
-
-
-.env:
-<p>MONGO_URI=mongodb+srv://name:password.........
-JWT_SECRET=
-PORT=5000
-</p>
-</p>
-</html>
