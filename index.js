@@ -6,7 +6,10 @@ const cors = require('cors');
 
 // Middleware for CORS and body parsing
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: '*', // Adjust this to allow only specific origins if needed
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+}));
 app.use(bodyParser.json());
 
 // Async middleware to dynamically import chalk for colored logs
@@ -14,7 +17,7 @@ const loggingMiddleware = async (req, res, next) => {
     const { default: chalk } = await import('chalk');
 
     const colorizeMethod = (method) => {
-        switch (method.trim()) {  // Ensuring method is 6 characters
+        switch (method.trim()) {
             case 'GET': return chalk.blue(method);
             case 'POST': return chalk.green(method);
             case 'PUT': return chalk.yellow(method);
@@ -25,27 +28,27 @@ const loggingMiddleware = async (req, res, next) => {
 
     const colorizeStatusCode = (statusCode) => {
         if (statusCode >= 200 && statusCode < 300) {
-            return chalk.green(statusCode); // Successful responses
+            return chalk.green(statusCode);
         } else if (statusCode >= 300 && statusCode < 400) {
-            return chalk.yellow(statusCode); // Redirects
+            return chalk.yellow(statusCode);
         } else {
-            return chalk.red(statusCode); // Errors
+            return chalk.red(statusCode);
         }
     };
 
     const statusMeaning = (statusCode) => {
         switch (statusCode) {
-            case 200: return "OK"; // The request has succeeded.
-            case 201: return "Created"; // The request has been fulfilled and has resulted in the creation of a new resource.
-            case 204: return "No Content"; // The server has successfully processed the request, but is not returning any content.
-            case 400: return "Bad Request"; // The server cannot process the request due to a client error (e.g., malformed request syntax).
-            case 401: return "Unauthorized"; // The request requires user authentication.
-            case 403: return "Forbidden"; // The server understands the request but refuses to authorize it.
-            case 404: return "Not Found"; // The server can't find the requested resource.
-            case 409: return "Conflict"; // The request could not be completed due to a conflict with the current state of the resource.
-            case 500: return "Internal Server Error"; // The server encountered an unexpected condition that prevented it from fulfilling the request.
-            case 503: return "Service Unavailable"; // The server is not ready to handle the request, typically due to temporary overloading or maintenance of the server.
-            default: return "Unknown Status"; // Fallback for any undefined status codes.
+            case 200: return "OK";
+            case 201: return "Created";
+            case 204: return "No Content";
+            case 400: return "Bad Request";
+            case 401: return "Unauthorized";
+            case 403: return "Forbidden";
+            case 404: return "Not Found";
+            case 409: return "Conflict";
+            case 500: return "Internal Server Error";
+            case 503: return "Service Unavailable";
+            default: return "Unknown Status";
         }
     };
 
@@ -62,14 +65,17 @@ const loggingMiddleware = async (req, res, next) => {
     next();
 };
 
-
 // Apply logging middleware
 app.use(loggingMiddleware);
 
 // Import and use routes
 const authRoute = require("./routes/auth");
-
 app.use('/api/user', authRoute);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK' });
+});
 
 // Connect to MongoDB
 async function main() {
