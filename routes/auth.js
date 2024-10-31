@@ -12,7 +12,7 @@ const router = express.Router();
 
 // Validation schema
 const registerSchema = Joi.object({
-  name: Joi.string().min(3).required(),
+  username: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
 });
@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
 
     // Create new user
     const user = new User({
-      name: req.body.name,
+      username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
     });
@@ -51,7 +51,7 @@ router.post('/register', async (req, res) => {
     });
 
     return res.send({
-      name: savedUser.name,
+      username: savedUser.username,
       token,
     });
   } catch (err) {
@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
     });
 
     return res.header('Authorization', token).send({
-      name: user.name,
+      username: user.username,
       token,
     });
   } catch (err) {
