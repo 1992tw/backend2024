@@ -11,7 +11,8 @@ Run the following commands to install the necessary dependencies and start the d
 sudo npm install
 sudo npm run dev
 
-``` .env:
+```
+.env:
 MONGO_URI=mongodb+srv://name:password.........
 JWT_SECRET=
 PORT=5000
