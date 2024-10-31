@@ -3,6 +3,7 @@
 sudo npm i
 sudo npm run dev
 
+
 .env:
 MONGO_URI=mongodb+srv://name:password.........
 JWT_SECRET=
