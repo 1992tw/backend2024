@@ -1,4 +1,3 @@
-// routes/auth.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -29,8 +28,12 @@ router.post('/register', async (req, res) => {
     const { error } = registerSchema.validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
+    // Convert username and email to lowercase
+    const username = req.body.username.toLowerCase();
+    const email = req.body.email.toLowerCase();
+
     // Check if user exists
-    const emailExists = await User.findOne({ email: req.body.email });
+    const emailExists = await User.findOne({ email });
     if (emailExists) return res.status(409).send('Email already exists');
 
     // Hash password
@@ -39,8 +42,8 @@ router.post('/register', async (req, res) => {
 
     // Create new user
     const user = new User({
-      username: req.body.username,
-      email: req.body.email,
+      username,
+      email,
       password: hashedPassword,
     });
 
@@ -67,8 +70,11 @@ router.post('/login', async (req, res) => {
     const { error } = loginSchema.validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
+    // Convert email to lowercase
+    const email = req.body.email.toLowerCase();
+
     // Check if user exists
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email });
     if (!user) return res.status(401).send('Email or password is incorrect');
 
     // Validate password
