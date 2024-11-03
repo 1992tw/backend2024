@@ -12,6 +12,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+
 // Async middleware to dynamically import chalk for colored logs
 const loggingMiddleware = async (req, res, next) => {
     const { default: chalk } = await import('chalk');
@@ -54,7 +55,7 @@ const loggingMiddleware = async (req, res, next) => {
 
     res.on('finish', () => {
         const logInfo = `${colorizeMethod(req.method)} ${req.originalUrl} - Status: ${colorizeStatusCode(res.statusCode)} (${statusMeaning(res.statusCode)})`;
-        
+
         // Log errors only if they exist
         if (res.statusCode >= 400) {
             console.error(logInfo);
