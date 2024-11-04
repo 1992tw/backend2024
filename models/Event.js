@@ -3,8 +3,7 @@ const commentSchema = require('./Comment').schema; // Import the comment schema
 
 // Event Schema
 const eventSchema = new mongoose.Schema({
-  date: { type: String, required: true },
-  time: { type: String, required: true },
+  date: { type: Date, required: true },
   eventType: { type: String, default: 'pickleball' },
   public: { type: Boolean, default: true },
   fees: { type: Number, default: 0 },
