@@ -12,7 +12,6 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
-
 // Async middleware to dynamically import chalk for colored logs
 const loggingMiddleware = async (req, res, next) => {
     const { default: chalk } = await import('chalk');
@@ -55,7 +54,6 @@ const loggingMiddleware = async (req, res, next) => {
 
     res.on('finish', () => {
         const logInfo = `${colorizeMethod(req.method)} ${req.originalUrl} - Status: ${colorizeStatusCode(res.statusCode)} (${statusMeaning(res.statusCode)})`;
-
         // Log errors only if they exist
         if (res.statusCode >= 400) {
             console.error(logInfo);
@@ -71,7 +69,9 @@ app.use(loggingMiddleware);
 
 // Import and use routes
 const authRoute = require("./routes/auth");
+const eventRoute = require("./routes/event"); // Make sure to create this route file
 app.use('/api/user', authRoute);
+app.use('/api/events', eventRoute); // Register event routes
 
 // Health check endpoint
 app.get('/health', (req, res) => {

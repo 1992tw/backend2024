@@ -65,6 +65,7 @@ router.post('/register', async (req, res) => {
 
 // Login Route
 router.post('/login', async (req, res) => {
+  console.log('Login route hit'); // Debugging log
   try {
     // Validate input
     const { error } = loginSchema.validate(req.body);
