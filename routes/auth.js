@@ -55,6 +55,7 @@ router.post('/register', async (req, res) => {
 
     return res.send({
       username: savedUser.username,
+      userId: savedUser._id,
       token,
     });
   } catch (err) {
@@ -92,6 +93,7 @@ router.post('/login', async (req, res) => {
 
     return res.header('Authorization', token).send({
       username: user.username,
+      userId: user._id,
       token,
     });
   } catch (err) {
@@ -114,7 +116,7 @@ const transporter = nodemailer.createTransport({
 
 // Reset Password Endpoint
 router.post('/reset-password', async (req, res) => {
-  const { newPassword, resetCode } = req.body;
+  const { newPassword, www } = req.body;
 
   try {
     // Find the user with the matching reset token and check expiration
