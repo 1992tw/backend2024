@@ -55,7 +55,7 @@ router.post('/register', async (req, res) => {
 
     return res.send({
       username: savedUser.username,
-      userId: savedUser._id,
+      userId: savedUser._id, // send userId
       token,
     });
   } catch (err) {
@@ -93,7 +93,7 @@ router.post('/login', async (req, res) => {
 
     return res.header('Authorization', token).send({
       username: user.username,
-      userId: user._id,
+      userId: user._id, // send userId
       token,
     });
   } catch (err) {

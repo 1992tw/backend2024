@@ -218,33 +218,69 @@ router.post('/create', verifyToken, async (req, res) => {
 });
 
 
-
-// Edit Event (Only the creator can edit)
+// Edit event
 router.put('/edit/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
   const userId = req.user._id;
 
+  // Check if required fields are present
+  const requiredFields = ['eventType', 'address', 'fees', 'weather']; // Remove 'date' from the required list
+  for (const field of requiredFields) {
+    if (!updates[field]) {
+      return res.status(400).json({ message: `Missing required field: ${field}` });
+    }
+  }
+
   try {
     const event = await Event.findById(id);
-    if (!event) return res.status(404).send("Event not found");
+    if (!event) return res.status(404).json({ message: 'Event not found' });
 
+    // Ensure only the creator can edit the event
     if (!event.createdBy.equals(userId)) {
-      return res.status(403).send("You are not authorized to edit this event");
+      return res.status(403).json({ message: 'You are not authorized to edit this event' });
+    }
+
+    // Only update the date if 'dateString' is provided
+    if (updates.dateString) {
+      event.date = new Date(updates.dateString); // Convert dateString to Date object
     }
 
     // Update event with new data
     Object.assign(event, updates);
-    event.updatedDate = new Date();
-    event.updatedTime = new Date().toTimeString().split(' ')[0];
+    event.updatedDate = new Date(); // Update the 'updatedDate' field
 
+    // Save the updated event
     const updatedEvent = await event.save();
     res.status(200).json(updatedEvent); // Return the updated event
   } catch (error) {
     console.error(error); // Log error for debugging
-    res.status(500).send("Error editing event");
+    res.status(500).json({ message: 'Error editing event', error: error.message });
   }
 });
+
+
+
+
+// Get Event Details for Editing
+router.get('/details/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const event = await Event.findById(id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Return the event details
+    res.status(200).json(event);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching event details', error: error.message });
+  }
+});
+
 
 // Join Event
 router.post('/join/:id', verifyToken, async (req, res) => {
