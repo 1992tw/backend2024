@@ -64,6 +64,27 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// **New**: Get User by ID Route
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user by userId
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).send('User not found');
+
+    // Return the username and userId
+    res.status(200).json({
+      username: user.username,
+      userId: user._id,
+    });
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+
 // Login Route
 router.post('/login', async (req, res) => {
   console.log('Login route hit'); // Debugging log
