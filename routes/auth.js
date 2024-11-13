@@ -7,6 +7,8 @@ const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const router = express.Router();
 dotenv.config();
+const verifyToken = require('../middleware/verifyToken');
+const Event = require('../models/Event');
 
 // Validation schema for registration
 const registerSchema = Joi.object({
@@ -87,7 +89,6 @@ router.get('/:userId', async (req, res) => {
 
 // Login Route
 router.post('/login', async (req, res) => {
-  console.log('Login route hit'); // Debugging log
   try {
     // Validate input
     const { error } = loginSchema.validate(req.body);
@@ -193,6 +194,49 @@ router.post('/forgot-pass', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'An error occurred while processing your request.' });
+  }
+});
+
+// DELETE Route: Delete User
+
+// Combined Route: Delete User, their events, and comments
+router.delete('/delete/:userId', verifyToken, async (req, res) => {
+  const { userId } = req.params; // UserId from the URL
+  const currentUserId = req.user._id; // User ID from the token (authenticated user)
+
+  // Ensure that the user can only delete their own events and comments, or an admin can delete any user
+  if (userId !== currentUserId.toString() && !req.user.isAdmin) {
+    return res.status(403).json({ message: 'You are not authorized to delete this user\'s events and comments' });
+  }
+
+  try {
+    // Delete comments where the user is the author
+    await Event.updateMany(
+      { 'comments.username': userId },  // Find events with comments from this user
+      { $pull: { comments: { username: userId } } } // Remove the user's comments
+    );
+
+    // Delete all events created by the user, joined by the user, or invited to the user
+    await Event.deleteMany({
+      $or: [
+        { createdBy: userId },          // Delete events created by the user
+        { joinedPlayers: userId },      // Delete events the user has joined
+        { invitedPlayers: userId }      // Delete events the user has been invited to
+      ]
+    });
+
+    // Find and delete the user
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // Send success response
+    res.status(200).json({ message: 'User and all associated events and comments have been deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error deleting user, events, and comments', error: error.message });
   }
 });
 
